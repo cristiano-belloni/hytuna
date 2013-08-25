@@ -10,7 +10,7 @@ define(['require', 'kievII', 'tuna-amd', 'image'], function(require, K2, Tuna) {
             type: 'canvas',
             width: 274,
             height: 131
-        },
+        }
     };
   
     var pluginFunction = function(args, resources) {
@@ -24,29 +24,38 @@ define(['require', 'kievII', 'tuna-amd', 'image'], function(require, K2, Tuna) {
         var deckImage =  resources[1];
         
         var tuna = new Tuna(this.context);
+
+        if (args.initialState && args.initialState.data) {
+            /* Load data */
+            this.pluginState = args.initialState.data;
+        }
+        else {
+            /* Use default data */
+            this.pluginState = {
+                rate: 1.5,         //0.01 to 8+
+                feedback: 0.2,     //0 to 1+
+                delay: 0.0045,     //0 to 1
+                bypass: 0
+            };
+        }
         
-        this.chorus = new tuna.Chorus({
-                  rate: 1.5,         //0.01 to 8+
-                  feedback: 0.2,     //0 to 1+
-                  delay: 0.0045,     //0 to 1
-                  bypass: 0
-              });
+        this.chorus = new tuna.Chorus(this.pluginState);
     
-       this.audioSource.connect(this.chorus.input);
-       this.chorus.connect(this.audioDestination);
+        this.audioSource.connect(this.chorus.input);
+        this.chorus.connect(this.audioDestination);
        
-       // The canvas part
-       this.ui = new K2.UI ({type: 'CANVAS2D', target: args.canvas});
+        // The canvas part
+        this.ui = new K2.UI ({type: 'CANVAS2D', target: args.canvas});
         
-       this.viewWidth = args.canvas.width;
-       this.viewHeight = args.canvas.height;
+        this.viewWidth = args.canvas.width;
+        this.viewHeight = args.canvas.height;
        
-       var initOffset = 22;
-       var knobSpacing = 83;
-       var knobTop = 20;
-       this.knobDescription = [ {id: 'rate', init: 1.5, range: [0.01,8]},
-                                {id: 'feedback', init: 0.2, range: [0,1]},
-                                {id: 'delay', init: 0.0045, range: [0,1]}
+        var initOffset = 22;
+        var knobSpacing = 83;
+        var knobTop = 20;
+        this.knobDescription = [ {id: 'rate', init: this.pluginState.rate, range: [0.01,8]},
+                                {id: 'feedback', init: this.pluginState.feedback, range: [0,1]},
+                                {id: 'delay', init: this.pluginState.delay, range: [0,1]}
                               ];
 
         /* deck */
@@ -71,6 +80,7 @@ define(['require', 'kievII', 'tuna-amd', 'image'], function(require, K2, Tuna) {
              imagesArray: [knobImage],
              bottomAngularOffset: 33,
              onValueSet: function (slot, value, element) {
+                this.pluginState[element] = value;
                 //Find the id
                 var knobElIndex = -1;
                 var currKnob;
@@ -104,6 +114,11 @@ define(['require', 'kievII', 'tuna-amd', 'image'], function(require, K2, Tuna) {
         }
        
         this.ui.refresh();
+
+        var saveState = function () {
+            return { data: this.pluginState };
+        };
+        args.hostInterface.setSaveState (saveState);
 
         // Initialization made it so far: plugin is ready.
         args.hostInterface.setInstanceStatus ('ready');
