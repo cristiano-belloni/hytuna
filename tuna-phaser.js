@@ -25,15 +25,24 @@ define(['require', 'kievII', 'tuna-amd', 'image'], function(require, K2, Tuna) {
         var deckImage =  resources[1];
         
         var tuna = new Tuna(this.context);
+
+        if (args.initialState && args.initialState.data) {
+            /* Load data */
+            this.pluginState = args.initialState.data;
+        }
+        else {
+            /* Use default data */
+            this.pluginState = {
+                rate: 1.2,                     //0.01 to 8 is a decent range, but higher values are possible
+                depth: 0.3,                    //0 to 1
+                feedback: 0.2,                 //0 to 1+
+                stereoPhase: 30,               //0 to 180
+                baseModulationFrequency: 700,  //500 to 1500
+                bypass: 0
+            };
+        }
         
-        this.phaser = new tuna.Phaser({
-                 rate: 1.2,                     //0.01 to 8 is a decent range, but higher values are possible
-                 depth: 0.3,                    //0 to 1
-                 feedback: 0.2,                 //0 to 1+
-                 stereoPhase: 30,               //0 to 180
-                 baseModulationFrequency: 700,  //500 to 1500
-                 bypass: 0
-             });
+        this.phaser = new tuna.Phaser(this.pluginState);
     
        this.audioSource.connect(this.phaser.input);
        this.phaser.connect(this.audioDestination);
@@ -47,11 +56,11 @@ define(['require', 'kievII', 'tuna-amd', 'image'], function(require, K2, Tuna) {
        var initOffset = 22;
        var knobSpacing = 83;
        var knobTop = 20;
-       this.knobDescription = [ {id: 'rate', init: 1.2, range: [0.01, 8]},
-                                {id: 'depth', init: 0.3, range: [0,1]},
-                                {id: 'feedback', init: 0.2, range: [0,1]},
-                                {id: 'stereoPhase', init: 3, range: [0,180]},
-                                {id: 'baseModulationFrequency', init: 700, range: [500,1500]}
+       this.knobDescription = [ {id: 'rate', init: this.pluginState.rate, range: [0.01, 8]},
+                                {id: 'depth', init: this.pluginState.depth, range: [0,1]},
+                                {id: 'feedback', init: this.pluginState.feedback, range: [0,1]},
+                                {id: 'stereoPhase', init: this.pluginState.stereoPhase, range: [0,180]},
+                                {id: 'baseModulationFrequency', init: this.pluginState.baseModulationFrequency, range: [500,1500]}
                               ];
 
         /* deck */
@@ -89,7 +98,7 @@ define(['require', 'kievII', 'tuna-amd', 'image'], function(require, K2, Tuna) {
                 if (knobElIndex !== -1) {
                     var setValue = K2.MathUtils.linearRange (0, 1, currKnob.range[0], currKnob.range[1], value);
                     console.log ("Setting", value, setValue, "to", element);
-                    this.phaser[element] =  setValue;
+                    this.phaser[element] = this.pluginState[element] = setValue;
                 }
                 else {
                     console.error ("element index invalid:",  knobElIndex);
@@ -109,6 +118,11 @@ define(['require', 'kievII', 'tuna-amd', 'image'], function(require, K2, Tuna) {
         }
        
         this.ui.refresh();
+
+        var saveState = function () {
+            return { data: this.pluginState };
+        };
+        args.hostInterface.setSaveState (saveState);
 
         // Initialization made it so far: plugin is ready.
         args.hostInterface.setInstanceStatus ('ready');
