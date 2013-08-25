@@ -140,7 +140,7 @@ define(['require', 'kievII', 'tuna-amd', 'image'], function(require, K2, Tuna) {
         
         this.ui.addElement(new K2.Button(buttonArgs));
 
-        if (this.wahwah.automode) {
+        if (this.pluginState.automode) {
             this.ui.setValue ({elementID: buttonArgs.ID, value: 1});
         }
         else {
