@@ -80,7 +80,6 @@ define(['require', 'kievII', 'tuna-amd', 'image'], function(require, K2, Tuna) {
              imagesArray: [knobImage],
              bottomAngularOffset: 33,
              onValueSet: function (slot, value, element) {
-                this.pluginState[element] = value;
                 //Find the id
                 var knobElIndex = -1;
                 var currKnob;
@@ -94,7 +93,7 @@ define(['require', 'kievII', 'tuna-amd', 'image'], function(require, K2, Tuna) {
                 if (knobElIndex !== -1) {
                     var setValue = K2.MathUtils.linearRange (0, 1, currKnob.range[0], currKnob.range[1], value);
                     console.log ("Setting", value, setValue, "to", element);
-                    this.chorus[element] =  setValue;
+                    this.chorus[element] = this.pluginState[element] = setValue;
                 }
                 else {
                     console.error ("element index invalid:",  knobElIndex);
