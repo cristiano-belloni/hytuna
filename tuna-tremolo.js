@@ -25,13 +25,22 @@ define(['require', 'kievII', 'tuna-amd', 'image'], function(require, K2, Tuna) {
         var deckImage =  resources[1];
         
         var tuna = new Tuna(this.context);
+
+        if (args.initialState && args.initialState.data) {
+            /* Load data */
+            this.pluginState = args.initialState.data;
+        }
+        else {
+            /* Use default data */
+            this.pluginState = {
+                intensity: 0.3,    //0 to 1
+                rate: 0.1,         //0.001 to 8
+                stereoPhase: 0,    //0 to 180
+                bypass: 0
+            };
+        }
         
-        this.tremolo = new tuna.Tremolo({
-                  intensity: 0.3,    //0 to 1
-                  rate: 0.1,         //0.001 to 8
-                  stereoPhase: 0,    //0 to 180
-                  bypass: 0
-              });
+        this.tremolo = new tuna.Tremolo(this.pluginState);
     
        this.audioSource.connect(this.tremolo.input);
        this.tremolo.connect(this.audioDestination);
@@ -45,9 +54,9 @@ define(['require', 'kievII', 'tuna-amd', 'image'], function(require, K2, Tuna) {
        var initOffset = 22;
        var knobSpacing = 83;
        var knobTop = 20;
-       this.knobDescription = [ {id: 'intensity', init: 0.3, range: [0,1]},
-                                {id: 'rate', init: 0.1, range: [0.001,8]},
-                                {id: 'stereoPhase', init: 0, range: [0,180]}
+       this.knobDescription = [ {id: 'intensity', init: this.pluginState.intensity, range: [0,1]},
+                                {id: 'rate', init: this.pluginState.rate, range: [0.001,8]},
+                                {id: 'stereoPhase', init: this.pluginState.stereoPhase, range: [0,180]}
                               ];
 
         /* deck */
@@ -85,7 +94,7 @@ define(['require', 'kievII', 'tuna-amd', 'image'], function(require, K2, Tuna) {
                 if (knobElIndex !== -1) {
                     var setValue = K2.MathUtils.linearRange (0, 1, currKnob.range[0], currKnob.range[1], value);
                     console.log ("Setting", value, setValue, "to", element);
-                    this.tremolo[element] =  setValue;
+                    this.tremolo[element] = this.pluginState[element] = setValue;
                 }
                 else {
                     console.error ("element index invalid:",  knobElIndex);
@@ -105,6 +114,11 @@ define(['require', 'kievII', 'tuna-amd', 'image'], function(require, K2, Tuna) {
         }
        
         this.ui.refresh();
+
+        var saveState = function () {
+            return { data: this.pluginState };
+        };
+        args.hostInterface.setSaveState (saveState);
 
         // Initialization made it so far: plugin is ready.
         args.hostInterface.setInstanceStatus ('ready');
