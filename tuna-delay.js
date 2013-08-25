@@ -22,40 +22,49 @@ define(['require', 'kievII', 'tuna-amd', 'image'], function(require, K2, Tuna) {
         
         var knobImage =  resources[0];
         var deckImage =  resources[1];
-        
-        var tuna = new Tuna(this.context);
-        
-        this.delay = new tuna.Delay({
+
+        if (args.initialState && args.initialState.data) {
+            /* Load data */
+            this.pluginState = args.initialState.data;
+        }
+        else {
+            /* Use default data */
+            this.pluginState = {
                 feedback: 0.45,    //0 to 1+
-                delayTime: 150,    //how many milliseconds should the wet signal be delayed? 
+                delayTime: 150,    //how many milliseconds should the wet signal be delayed?
                 wetLevel: 0.25,    //0 to 1+
                 dryLevel: 1,       //0 to 1+
                 cutoff: 20,        //cutoff frequency of the built in highpass-filter. 20 to 22050
                 bypass: 0
-       });
+            };
+        }
+        
+        var tuna = new Tuna(this.context);
+        
+        this.delay = new tuna.Delay(this.pluginState);
         
     
-       this.audioSource.connect(this.delay.input);
-       this.delay.connect(this.audioDestination);
+        this.audioSource.connect(this.delay.input);
+        this.delay.connect(this.audioDestination);
        
-       // The canvas part
-       this.ui = new K2.UI ({type: 'CANVAS2D', target: args.canvas});
-        
-       this.viewWidth = args.canvas.width;
-       this.viewHeight = args.canvas.height;
-       
-       var initOffset = 22;
-       var knobSpacing = 83;
-       var knobTop = 20;
-       this.knobDescription = [ {id: 'feedback', init: 0.45, range: [0,1]},
-                                {id: 'delayTime', init: 150, range: [0,250]},
-                                {id: 'wetLevel', init: 0.25, range: [0,1]},
-                                {id: 'dryLevel', init: 1, range: [0,1]},
-                                {id: 'cutoff', init: 20, range: [20,8000]}
+        // The canvas part
+        this.ui = new K2.UI ({type: 'CANVAS2D', target: args.canvas});
+
+        this.viewWidth = args.canvas.width;
+        this.viewHeight = args.canvas.height;
+
+        var initOffset = 22;
+        var knobSpacing = 83;
+        var knobTop = 20;
+        this.knobDescription = [ {id: 'feedback', init: this.pluginState.feedback, range: [0,1]},
+                                {id: 'delayTime', init: this.pluginState.delayTime, range: [0,250]},
+                                {id: 'wetLevel', init: this.pluginState.wetLevel, range: [0,1]},
+                                {id: 'dryLevel', init: this.pluginState.dryLevel, range: [0,1]},
+                                {id: 'cutoff', init: this.pluginState.cutoff, range: [20,8000]}
                               ];
 
         /* deck */
-       var bgArgs = new K2.Background({
+        var bgArgs = new K2.Background({
             ID: 'background',
             image: deckImage,
             top: 0,
@@ -89,7 +98,7 @@ define(['require', 'kievII', 'tuna-amd', 'image'], function(require, K2, Tuna) {
                 if (knobElIndex !== -1) {
                     var setValue = K2.MathUtils.linearRange (0, 1, currKnob.range[0], currKnob.range[1], value);
                     console.log ("Setting", value, setValue, "to", element);
-                    this.delay[element] =  setValue;
+                    this.delay[element] = this.pluginState[element] = setValue;
                 }
                 else {
                     console.error ("element index invalid:",  knobElIndex);
@@ -109,6 +118,11 @@ define(['require', 'kievII', 'tuna-amd', 'image'], function(require, K2, Tuna) {
         }
        
         this.ui.refresh();
+
+        var saveState = function () {
+            return { data: this.pluginState };
+        };
+        args.hostInterface.setSaveState (saveState);
 
         // Initialization made it so far: plugin is ready.
         args.hostInterface.setInstanceStatus ('ready');
