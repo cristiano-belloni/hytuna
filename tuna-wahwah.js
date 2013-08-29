@@ -1,4 +1,5 @@
-define(['require', 'kievII', 'tuna-amd', 'image'], function(require, K2, Tuna) {
+define(['require', 'github:janesconference/KievII@v0.5.0-jspm/dist/kievII',
+    'github:janesconference/tuna/tuna'], function(require, K2, Tuna) {
   
     var pluginConf = {
         name: "Tuna Wah-Wah",
@@ -10,7 +11,7 @@ define(['require', 'kievII', 'tuna-amd', 'image'], function(require, K2, Tuna) {
             type: 'canvas',
             width: 508,
             height: 131
-        },
+        }
     };
   
     var pluginFunction = function(args, resources) {
@@ -168,10 +169,10 @@ define(['require', 'kievII', 'tuna-amd', 'image'], function(require, K2, Tuna) {
             args.hostInterface.setInstanceStatus ('fatal', {description: 'Error initializing plugin: ' + failedId});
         }.bind(this);
         
-        require (['image!./assets/images/knob_64_64_64.png!rel',
-                  'image!./assets/images/TWWDeck.png!rel',
-                  'image!./assets/images/switch_up.png!rel',
-                  'image!./assets/images/switch_down.png!rel'],
+        require (['./assets/images/knob_64_64_64.png!image',
+                  './assets/images/TWWDeck.png!image',
+                  './assets/images/switch_up.png!image',
+                  './assets/images/switch_down.png!image'],
             function () {
                 var resources = arguments;
                 pluginFunction.call (this, args, resources);

@@ -1,4 +1,5 @@
-define(['require', 'kievII', 'tuna-amd', 'image'], function(require, K2, Tuna) {
+define(['require', 'github:janesconference/KievII@v0.5.0-jspm/dist/kievII',
+    'github:janesconference/tuna/tuna'], function(require, K2, Tuna) {
   
     var pluginConf = {
         name: "Tuna Tremolo",
@@ -10,7 +11,7 @@ define(['require', 'kievII', 'tuna-amd', 'image'], function(require, K2, Tuna) {
             type: 'canvas',
             width: 274,
             height: 131
-        },
+        }
     };
   
     var pluginFunction = function(args, resources) {
@@ -134,8 +135,8 @@ define(['require', 'kievII', 'tuna-amd', 'image'], function(require, K2, Tuna) {
             args.hostInterface.setInstanceStatus ('fatal', {description: 'Error initializing plugin: ' + failedId});
         }.bind(this);
         
-        require (['image!./assets/images/knob_64_64_64.png!rel',
-                  'image!./assets/images/TTDeck.png!rel'],
+        require (['./assets/images/knob_64_64_64.png!image',
+                  './assets/images/TTDeck.png!image'],
             function () {
                 var resources = arguments;
                 pluginFunction.call (this, args, resources);
