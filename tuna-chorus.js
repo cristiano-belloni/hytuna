@@ -1,4 +1,5 @@
-define(['require', 'kievII', 'tuna-amd', 'image'], function(require, K2, Tuna) {
+define(['require', 'github:janesconference/KievII@v0.5.0-jspm/dist/kievII',
+        'github:janesconference/tuna/tuna'], function(require, K2, Tuna) {
   
     var pluginConf = {
         name: "Tuna Chorus",
@@ -133,8 +134,8 @@ define(['require', 'kievII', 'tuna-amd', 'image'], function(require, K2, Tuna) {
             args.hostInterface.setInstanceStatus ('fatal', {description: 'Error initializing plugin: ' + failedId});
         }.bind(this);
 
-        var resList = [ 'image!./assets/images/knob_64_64_64.png!rel',
-                        'image!./assets/images/TCDeck.png!rel'];
+        var resList = [ './assets/images/knob_64_64_64.png!image',
+                        './assets/images/TCDeck.png!image'];
 
         require (resList,
             function () {
