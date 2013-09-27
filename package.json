@@ -1,4 +1,8 @@
 {
+	"dependencyMap": {
+    "tuna": "github:janesconference/tuna@0.1.1/tuna"
+  },
+	
     "buildConfig": {
         "uglify": true
     }
