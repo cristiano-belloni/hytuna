@@ -1,4 +1,4 @@
-define(['require', 'github:janesconference/KievII@jspm0.5/dist/kievII',
+define(['require', 'github:janesconference/KievII@0.6.0/kievII',
     'github:janesconference/tuna/tuna'], function(require, K2, Tuna) {
   
     var pluginConf = {
