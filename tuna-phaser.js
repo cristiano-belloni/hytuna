@@ -1,5 +1,5 @@
 define(['require', 'github:janesconference/KievII@0.6.0/kievII',
-    'lib:tuna'], function(require, K2, Tuna) {
+    'tuna'], function(require, K2, Tuna) {
   
     var pluginConf = {
         name: "Tuna Phaser",
