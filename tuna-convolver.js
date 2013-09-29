@@ -21,26 +21,10 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII',
         this.audioDestination = args.audioDestinations[0];
         this.context = args.audioContext;
         this.canvas = args.canvas;
+        this.loadedSample = null;
         
         var knobImage =  resources[0];
         var deckImage =  resources[1];
-
-        if (args.initialState && args.initialState.data) {
-            /* Load data */
-            this.pluginState = args.initialState.data;
-        }
-        else {
-            /* Use default data */
-            this.pluginState = {
-                highCut: 22050,                         //20 to 22050
-                lowCut: 20,                             //20 to 22050
-                dryLevel: 1,                            //0 to 1+
-                wetLevel: 1,                            //0 to 1+
-                level: 1,                               //0 to 1+, adjusts total output of both wet and dry
-                decodedImpulse: null,
-                bypass: 0
-            };
-        }
         
         var tuna = new Tuna(this.context);
         
@@ -107,7 +91,6 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII',
                 };
 
                 waveboxArgs.onValueSet = function (slot, value, element) {
-                    console.log ("onValueSet callback: slot is ", slot, " and value is ", value, " while el is ", element);
                     this.ui.refresh();
                 }.bind(this);
 
@@ -149,7 +132,31 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII',
         this.canvas.addEventListener("dragover", this.noopHandler, false);
         this.canvas.addEventListener("drop", this.drop, false);
 
-
+        if (args.initialState && args.initialState.data) {
+            /* Load data */
+            this.pluginState = args.initialState.data;
+            if (args.initialState.bin && args.initialState.bin.loadedSample) {
+                /* Load data */
+                var evt = {
+                    target: {
+                        result: args.initialState.bin.loadedSample
+                    }
+                };
+                this.handleReaderLoad (evt);
+            }
+        }
+        else {
+            /* Use default data */
+            this.pluginState = {
+                highCut: 22050,                         //20 to 22050
+                lowCut: 20,                             //20 to 22050
+                dryLevel: 1,                            //0 to 1+
+                wetLevel: 1,                            //0 to 1+
+                level: 1,                               //0 to 1+, adjusts total output of both wet and dry
+                decodedImpulse: null,
+                bypass: 0
+            };
+        }
 
         var initOffset = 21;
         var knobSpacing = 83;
@@ -218,7 +225,11 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII',
         this.ui.refresh();
 
         var saveState = function () {
-            return { data: this.pluginState };
+            return { data: this.pluginState,
+                     bin: {
+                         loadedSample: this.loadedSample
+                     }
+                    };
         };
         args.hostInterface.setSaveState (saveState);
 
