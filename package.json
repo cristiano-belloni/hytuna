@@ -1,6 +1,6 @@
 {
 	"dependencyMap": {
-    "tuna": "github:janesconference/tuna/tuna"
+    "tuna": "github:janesconference/tuna@master/tuna"
   },
 	
     "buildConfig": {

@@ -1,5 +1,5 @@
 define(['require', 'github:janesconference/KievII@0.6.0/kievII',
-    'github:janesconference/tuna/tuna'], function(require, K2, Tuna) {
+    'tuna'], function(require, K2, Tuna) {
   
     var pluginConf = {
         name: "Tuna Convolver",
@@ -20,6 +20,7 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII',
         this.audioSource = args.audioSources[0];
         this.audioDestination = args.audioDestinations[0];
         this.context = args.audioContext;
+        this.canvas = args.canvas;
         
         var knobImage =  resources[0];
         var deckImage =  resources[1];
@@ -51,6 +52,104 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII',
        
         // The canvas part
         this.ui = new K2.UI ({type: 'CANVAS2D', target: args.canvas});
+
+        // Member methods
+        this.drop = function (evt) {
+            evt.stopPropagation();
+            evt.preventDefault();
+
+            var files = evt.dataTransfer.files;
+            var count = files.length;
+
+            // Only call the handler if 1 or more files was dropped.
+            if (count > 0)
+                this.handleFiles(files);
+        }.bind(this);
+
+        this.handleFiles = function (files) {
+
+            var file = files[0];
+            console.log ("Loading ", file.name);
+            var reader = new FileReader();
+
+            // init the reader event handlers
+            reader.onload = this.handleReaderLoad;
+            // begin the read operation
+            reader.readAsArrayBuffer(file);
+
+        }.bind(this);
+
+        this.successCallback = function (decoded) {
+            console.log ("Decode succeeded!");
+            this.convo.decodedBuffer = decoded;
+
+            this.decoded_arrayL = decoded.getChannelData (0);
+
+            // TODO check if the signal is mono or stero here
+            // this.decoded_arrayR = decoded.getChannelData (1);
+
+            console.log ("I got the data!");
+
+            var waveID = 'wavebox_L';
+
+            if (!(this.ui.isElement(waveID))) {
+
+                // Wavebox parameters
+                var waveboxArgs = {
+                    ID: waveID,
+                    top: 10,
+                    left: 10,
+                    width: this.canvas.width - 10 * 2,
+                    height: 154,
+                    isListening: true,
+                    waveColor: '#FFBA00',
+                    transparency: 0.8
+                };
+
+                waveboxArgs.onValueSet = function (slot, value, element) {
+                    console.log ("onValueSet callback: slot is ", slot, " and value is ", value, " while el is ", element);
+                    this.ui.refresh();
+                }.bind(this);
+
+                var waveBox_L = new K2.Wavebox(waveboxArgs);
+                this.ui.addElement(waveBox_L, {zIndex: 2});
+            }
+
+            this.ui.setValue ({elementID: waveID, slot: "waveboxsignal", value: this.decoded_arrayL});
+
+            this.ui.refresh();
+
+        }.bind(this);
+
+        this.errorCallback = function () {
+            console.log ("Error!");
+            alert ("Error decoding ");
+        }.bind(this);
+
+        this.handleReaderLoad = function (evt) {
+
+            this.loadedSample = evt.target.result;
+            console.log (evt);
+
+            console.log ("Decoding file");
+
+            this.context.decodeAudioData(evt.target.result, this.successCallback, this.errorCallback);
+
+        }.bind(this);
+
+        // Drop event
+        this.noopHandler = function(evt) {
+            evt.stopPropagation();
+            evt.preventDefault();
+        };
+
+        // Init event handlers
+        this.canvas.addEventListener("dragenter", this.noopHandler, false);
+        this.canvas.addEventListener("dragexit", this.noopHandler, false);
+        this.canvas.addEventListener("dragover", this.noopHandler, false);
+        this.canvas.addEventListener("drop", this.drop, false);
+
+
 
         var initOffset = 21;
         var knobSpacing = 83;
@@ -132,9 +231,7 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII',
         var args = initArgs;
 
         var requireErr = function (err) {
-            var failedId = err.requireModules && err.requireModules[0];
-            requirejs.undef(failedId);
-            args.hostInterface.setInstanceStatus ('fatal', {description: 'Error initializing plugin: ' + failedId});
+            args.hostInterface.setInstanceStatus ('fatal', {description: 'Error initializing plugin'});
         }.bind(this);
         
         require (['./assets/images/knob_64_64_64.png!image',
