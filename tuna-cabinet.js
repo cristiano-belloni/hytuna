@@ -216,11 +216,11 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII',
         this.ui.refresh();
 
         var saveState = function () {
-            return { data: this.pluginState,
-                     bin: {
-                         loadedSample: this.loadedSample
-                     }
-                    };
+            var saveObj = {data: this.pluginState};
+            if (this.loadedSample) {
+                saveObj.bin = { loadedSample: this.loadedSample };
+            }
+            return saveObj;
         };
         args.hostInterface.setSaveState (saveState);
 
