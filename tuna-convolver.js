@@ -1,5 +1,4 @@
-define(['require', 'github:janesconference/KievII@0.6.0/kievII',
-    'tuna'], function(require, K2, Tuna) {
+define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'tuna'], function(require, K2, Tuna) {
   
     var pluginConf = {
         name: "Tuna Convolver",
