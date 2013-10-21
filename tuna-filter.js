@@ -57,7 +57,7 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII',
        
         var initOffset = 22;
         var knobSpacing = 113;
-        var knobTop = 106;
+        var knobTop = 90;
         this.knobDescription = [ {id: 'frequency', init: this.pluginState.frequency, range: [20, 22050]},
                                  {id: 'Q', init: this.pluginState.Q, range: [0.001, 100]},
                                  {id: 'gain', init: this.pluginState.gain, range: [-40,40]}
