@@ -123,7 +123,7 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII',
             ID: 'filterLabel',
             width : 50,
             height : 18,
-            top : 30,
+            top : 50,
             left : 166,
             transparency: 0.87,
             textColor: "white",
@@ -141,7 +141,7 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII',
         var buttonPlus = {
             ID: "buttonPlus",
             left: 40,
-            top: 30,
+            top: 50,
             imagesArray : [buttonPlusImage],
             onValueSet: function () {
                 // Plus called
@@ -167,7 +167,7 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII',
         var buttonMinus = {
             ID: "buttonMinus",
             left: 262,
-            top: 30,
+            top: 50,
             imagesArray : [buttonMinusImage],
             onValueSet: function () {
                 // Minus called
