@@ -133,9 +133,7 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII',
         var args = initArgs;
 
         var requireErr = function (err) {
-            var failedId = err.requireModules && err.requireModules[0];
-            requirejs.undef(failedId);
-            args.hostInterface.setInstanceStatus ('fatal', {description: 'Error initializing plugin: ' + failedId});
+            args.hostInterface.setInstanceStatus ('fatal', {description: 'Error initializing plugin'});
         }.bind(this);
         
         require (['./assets/images/knob_64_64_64.png!image',
