@@ -56,6 +56,9 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII',
             console.log ("Loading ", file.name);
             var reader = new FileReader();
 
+            // set the file to save in the future
+            this.loadedSample = file;
+
             // init the reader event handlers
             reader.onload = this.handleReaderLoad;
             // begin the read operation
@@ -110,10 +113,6 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII',
         }.bind(this);
 
         this.handleReaderLoad = function (evt) {
-
-            this.loadedSample = evt.target.result;
-            console.log (evt);
-
             console.log ("Decoding file");
 
             this.context.decodeAudioData(evt.target.result, this.successCallback, this.errorCallback);
@@ -135,14 +134,13 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII',
         if (args.initialState && args.initialState.data) {
             /* Load data */
             this.pluginState = args.initialState.data;
-            if (args.initialState.bin && args.initialState.bin.loadedSample) {
-                /* Load data */
-                var evt = {
-                    target: {
-                        result: args.initialState.bin.loadedSample
-                    }
-                };
-                this.handleReaderLoad (evt);
+
+            if (args.initialState && args.initialState.bin) {
+                /* Load bin */
+                this.handleFiles ([args.initialState.bin.loadedSample]);
+            }
+            else {
+                this.loadedSample = null;
             }
         }
         else {
