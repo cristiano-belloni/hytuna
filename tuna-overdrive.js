@@ -196,7 +196,7 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII',
         }.bind(this);
         
         require (['./assets/images/knob_64_64_64.png!image',
-                  './assets/images/TFDeck.png!image',
+                  './assets/images/TODeck.png!image',
                   './assets/images/button_plus.png!image',
                   './assets/images/button_minus.png!image'],
             function () {
