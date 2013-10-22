@@ -140,8 +140,7 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII',
                 var resources = arguments;
                 pluginFunction.call (this, args, resources);
             }.bind(this),
-            requireErr
-        );
+            requireErr);
             
     };
         
