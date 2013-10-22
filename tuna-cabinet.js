@@ -53,7 +53,9 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII',
         this.handleFiles = function (files) {
 
             var file = files[0];
-            console.log ("Loading ", file.name);
+            if (!file) return;
+
+            console.log ("Loading ", files);
             var reader = new FileReader();
 
             // set the file to save in the future
