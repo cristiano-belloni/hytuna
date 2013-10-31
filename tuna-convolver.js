@@ -230,7 +230,7 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'tuna'], functi
             }
             return saveObj;
         };
-        args.hostInterface.setSaveState (saveState);
+        args.hostInterface.setSaveState (saveState.bind(this));
 
         // Initialization made it so far: plugin is ready.
         args.hostInterface.setInstanceStatus ('ready');
