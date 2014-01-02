@@ -1,5 +1,5 @@
 {
-	"dependencyMap": {
+	"map": {
     "tuna": "github:janesconference/tuna@master/tuna"
   },
 	
