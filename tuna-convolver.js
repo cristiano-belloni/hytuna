@@ -110,7 +110,7 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII', 'tuna'], functi
 
         this.errorCallback = function () {
             console.log ("Error!");
-            alert ("Error decoding ");
+            // TODO signal the error to the user
         }.bind(this);
 
         this.handleReaderLoad = function (evt) {
