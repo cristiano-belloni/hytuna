@@ -174,7 +174,6 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII',
                 }
                 var parameter = this.findKnob (parmName);
                 var setValue = K2.MathUtils.linearRange (0, 1, parameter.range[0], parameter.range[1], message.value / 127);
-                // WAS: this.tremolo[parmName] = this.pluginState[element] = setValue;
                 // Use automate here, because we're Tuna!
                 this.tremolo.automate (parmName, setValue, null, null);
                 // TODO do we really want to save the MIDI - induced change in the state? This might be OK for keyboards attached, but not ok for sequencers.

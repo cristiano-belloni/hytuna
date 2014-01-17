@@ -1,5 +1,5 @@
 define(['require', 'github:janesconference/KievII@0.6.0/kievII',
-        'tuna'], function(require, K2, Tuna) {
+        'github:janesconference/tuna@master/tuna'], function(require, K2, Tuna) {
   
     var pluginConf = {
         name: "Tuna Chorus",
@@ -54,10 +54,21 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII',
         var initOffset = 22;
         var knobSpacing = 83;
         var knobTop = 20;
+        // TODO IS THERRE A 'depth' PARAMETER HERE?
         this.knobDescription = [ {id: 'rate', init: this.pluginState.rate, range: [0.01,8]},
                                 {id: 'feedback', init: this.pluginState.feedback, range: [0,1]},
                                 {id: 'delay', init: this.pluginState.delay, range: [0,1]}
                               ];
+
+        this.findKnob = function (id) {
+            var currKnob;
+            for (var i = 0; i < this.knobDescription.length; i+=1) {
+                currKnob = this.knobDescription[i];
+                if (currKnob.id === id) {
+                    return this.knobDescription[i];
+                }
+            }
+        };
 
         /* deck */
        var bgArgs = new K2.Background({
@@ -83,21 +94,13 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII',
              onValueSet: function (slot, value, element) {
                 //Find the id
                 var knobElIndex = -1;
-                var currKnob;
-                for (var i = 0; i < this.knobDescription.length; i+=1) {
-                    currKnob = this.knobDescription[i];
-                    if (currKnob.id === element) {
-                        knobElIndex = i;
-                        break;
-                    }
-                }
-                if (knobElIndex !== -1) {
+                var currKnob = this.findKnob (element);
+                if (currKnob) {
                     var setValue = K2.MathUtils.linearRange (0, 1, currKnob.range[0], currKnob.range[1], value);
-                    console.log ("Setting", value, setValue, "to", element);
                     this.chorus[element] = this.pluginState[element] = setValue;
                 }
                 else {
-                    console.error ("element index invalid:",  knobElIndex);
+                    console.error ("element not found:",  element);
                 }
                 
                 this.ui.refresh();
@@ -119,6 +122,65 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII',
             return { data: this.pluginState };
         };
         args.hostInterface.setSaveState (saveState.bind(this));
+
+        var onMIDIMessage = function (message, when) {
+            var now = this.context.currentTime;
+            //console.log ("arrived MIDI message: type / when / now", message.type, when, now);
+            if (when && (when < now)) {
+                console.log ("CHORUS: ******** OUT OF TIME CC MESSAGE");
+            }
+
+            var parmName;
+
+            // TODO is checking for if (when) ok? It is as long as the host sends 0, null, or undefined for an immediate message
+            // and a time value for a time-scheduled message. This should be in the specification somehow.
+            
+            if (message.type === 'controlchange') {
+                /* http://tweakheadz.com/midi-controllers/ */
+                // Using undefined controls
+                if (message.control === 21) {
+                    // rate
+                    if (when) {
+                        // Not automatable
+                        return;
+                    }
+                    else {
+                        parmName = "rate";
+                    }
+                }
+                else if (message.control === 22) {
+                    // feedback
+                    if (when) {
+                        // Not automatable
+                        return;
+                    }
+                    else {
+                        parmName = "feedback";
+                    }
+                }
+                else if (message.control === 23) {
+                    // delay
+                    if (when) {
+                        // Not automatable
+                        return;
+                    }
+                    else {
+                        parmName = "delay";
+                    }
+                }
+                else {
+                    return;
+                }
+                var parameter = this.findKnob (parmName);
+                var setValue = K2.MathUtils.linearRange (0, 1, parameter.range[0], parameter.range[1], message.value / 127);
+                // Use automate here, because we're Tuna!
+                this.chorus.automate (parmName, setValue, null, null);
+                // TODO do we really want to save the MIDI - induced change in the state? This might be OK for keyboards attached, but not ok for sequencers.
+                this.pluginState[parmName] = setValue;
+            }
+        };
+
+        args.MIDIHandler.setMIDICallback (onMIDIMessage. bind (this));
 
         // Initialization made it so far: plugin is ready.
         args.hostInterface.setInstanceStatus ('ready');
