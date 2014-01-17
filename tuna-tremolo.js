@@ -1,5 +1,5 @@
 define(['require', 'github:janesconference/KievII@0.6.0/kievII',
-    'tuna'], function(require, K2, Tuna) {
+    'github:janesconference/tuna@master/tuna'], function(require, K2, Tuna) {
   
     var pluginConf = {
         name: "Tuna Tremolo",
@@ -65,8 +65,8 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII',
             var currKnob;
             for (var i = 0; i < this.knobDescription.length; i+=1) {
                 currKnob = this.knobDescription[i];
-                if (currKnob.id === element) {
-                    return this.knobDescription [i];
+                if (currKnob.id === id) {
+                    return this.knobDescription[i];
                 }
             }
         };
@@ -178,7 +178,7 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII',
                 // Use automate here, because we're Tuna!
                 this.tremolo.automate (parmName, setValue, null, null);
                 // TODO do we really want to save the MIDI - induced change in the state? This might be OK for keyboards attached, but not ok for sequencers.
-                this.pluginState[element] = setValue;
+                this.pluginState[parmName] = setValue;
             }
         };
 
