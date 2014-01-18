@@ -155,7 +155,9 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII',
         // Throttle the repaints
         this.repaintFunc = this.throttle (function (id, value) {
             /* TODO TRANSFORM THE VALUE BACK */
-            this.ui.setValue ({elementID: id, value: value /*this.tremolo[id]*/, fireCallback:false});
+            var parameter = this.findKnob (id);
+            var setValue = K2.MathUtils.linearRange (parameter.range[0], parameter.range[1], 0, 1, value);
+            this.ui.setValue ({elementID: id, value: setValue, fireCallback:false});
             this.ui.refresh();
         }.bind(this),
         500);
@@ -217,7 +219,7 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII',
                 this.pluginState[parmName] = setValue;
 
                 // Repaint
-                this.repaintFunc (parmName, message.value / 127);
+                this.repaintFunc (parmName, setValue);
             }
         };
 
