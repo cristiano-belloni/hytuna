@@ -41,6 +41,34 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII',
                 bypass: 0
             };
         }
+
+        this.throttle = function(func, wait, options) {
+            var context, args, result;
+            var timeout = null;
+            var previous = 0;
+            options || (options = {});
+            var later = function() {
+                previous = options.leading === false ? 0 : new Date;
+                timeout = null;
+                result = func.apply(context, args);
+            };
+            return function() {
+                var now = new Date;
+                if (!previous && options.leading === false) previous = now;
+                var remaining = wait - (now - previous);
+                context = this;
+                args = arguments;
+                if (remaining <= 0) {
+                    clearTimeout(timeout);
+                    timeout = null;
+                    previous = now;
+                    result = func.apply(context, args);
+                } else if (!timeout && options.trailing !== false) {
+                    timeout = setTimeout(later, remaining);
+                }
+                return result;
+            };
+        };
         
         this.tremolo = new tuna.Tremolo(this.pluginState);
     
@@ -124,6 +152,14 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII',
         };
         args.hostInterface.setSaveState (saveState.bind (this));
 
+        // Throttle the repaints
+        this.repaintFunc = this.throttle (function (id, value) {
+            /* TODO TRANSFORM THE VALUE BACK */
+            this.ui.setValue ({elementID: id, value: value /*this.tremolo[id]*/, fireCallback:false});
+            this.ui.refresh();
+        }.bind(this),
+        500);
+
         var onMIDIMessage = function (message, when) {
             var now = this.context.currentTime;
             //console.log ("arrived MIDI message: type / when / now", message.type, when, now);
@@ -179,6 +215,9 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII',
                 this.tremolo[parmName] = setValue;
                 // TODO do we really want to save the MIDI - induced change in the state? This might be OK for keyboards attached, but not ok for sequencers.
                 this.pluginState[parmName] = setValue;
+
+                // Repaint
+                this.repaintFunc (parmName, message.value / 127);
             }
         };
 
