@@ -1,12 +1,12 @@
 define(['require', 'github:janesconference/KievII@0.6.0/kievII',
-    'tuna'], function(require, K2, Tuna) {
+    'github:janesconference/tuna@master/tuna', './utilities'], function(require, K2, Tuna, u) {
   
     var pluginConf = {
         name: "Tuna Phaser",
         osc: false,
         audioOut: 1,
         audioIn: 1,
-        version: '0.0.1-alpha1',
+        version: '0.0.2',
         ui: {
             type: 'canvas',
             width: 441,
@@ -63,6 +63,16 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII',
                                 {id: 'stereoPhase', init: this.pluginState.stereoPhase, range: [0,180]},
                                 {id: 'baseModulationFrequency', init: this.pluginState.baseModulationFrequency, range: [500,1500]}
                               ];
+
+        this.findKnob = function (id) {
+            var currKnob;
+            for (var i = 0; i < this.knobDescription.length; i+=1) {
+                currKnob = this.knobDescription[i];
+                if (currKnob.id === id) {
+                    return this.knobDescription[i];
+                }
+            }
+        };
 
         /* deck */
        var bgArgs = new K2.Background({
@@ -124,6 +134,119 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII',
             return { data: this.pluginState };
         };
         args.hostInterface.setSaveState (saveState.bind(this));
+
+        this.repainter = function (id, value) {
+            // Transform the value back
+            var parameter = this.findKnob (id);
+            var setValue = K2.MathUtils.linearRange (parameter.range[0], parameter.range[1], 0, 1, value);
+            this.ui.setValue ({elementID: id, value: setValue, fireCallback:false});
+            this.ui.refresh();
+        };
+
+        /* 'rate', init: this.plugin
+         'depth', init: this.plugi
+         'feedback', init: this.pl
+         'stereoPhase', init: this
+         'baseModulationFrequency'*/
+
+        this.throttledFuncs = {
+            rate: u.throttle(function (val) { this.repainter ("rate", val)}, 500).bind(this),
+            depth: u.throttle(function (val) { this.repainter ("depth", val)}, 500).bind(this),
+            feedback: u.throttle(function (val) { this.repainter ("feedback", val)}, 500).bind(this),
+            stereoPhase: u.throttle(function (val) { this.repainter ("stereoPhase", val)}, 500).bind(this),
+            baseModulationFrequency: u.throttle(function (val) { this.repainter ("baseModulationFrequency", val)}, 500).bind(this)
+        };
+
+        var onMIDIMessage = function (message, when) {
+
+            var parmName;
+
+            // TODO is checking for if (when) ok? It is as long as the host sends 0, null, or undefined for an immediate message
+            // and a time value for a time-scheduled message. This should be in the specification somehow.
+
+            if (message.type === 'controlchange') {
+                /* http://tweakheadz.com/midi-controllers/ */
+                // Using undefined controls
+                if (message.control === 21) {
+                    // curveAmount
+                    if (when) {
+                        // Not automatable
+                        return;
+                    }
+                    else {
+                        parmName = "rate";
+                    }
+                }
+                else if (message.control === 22) {
+                    // curveAmount
+                    if (when) {
+                        // Not automatable
+                        return;
+                    }
+                    else {
+                        parmName = "depth";
+                    }
+                }
+                else if (message.control === 23) {
+                    // curveAmount
+                    if (when) {
+                        // Not automatable
+                        return;
+                    }
+                    else {
+                        parmName = "feedback";
+                    }
+                }
+                else if (message.control === 24) {
+                    // curveAmount
+                    if (when) {
+                        // Not automatable
+                        return;
+                    }
+                    else {
+                        parmName = "stereoPhase";
+                    }
+                }
+                else if (message.control === 25) {
+                    // curveAmount
+                    if (when) {
+                        // Not automatable
+                        return;
+                    }
+                    else {
+                        parmName = "baseModulationFrequency";
+                    }
+                }
+                else {
+                    return;
+                }
+
+                var parameter = this.findKnob (parmName);
+                var setValue = K2.MathUtils.linearRange (0, 1, parameter.range[0], parameter.range[1], message.value / 127);
+
+                if (!when) {
+                    // Immediately
+                    this.phaser[parmName] = setValue;
+                    this.pluginState[parmName] = setValue;
+                    // Repaint
+                    this.throttledFuncs[parmName](setValue);
+                }
+                else {
+                    var now = this.context.currentTime;
+                    var delta = when - now;
+                    if (delta < 0) {
+                        console.log ("PHASER: ******** OUT OF TIME CC MESSAGE");
+                    }
+                    else {
+                        setTimeout (this.throttledFuncs[parmName], delta * 1000, setValue);
+                    }
+                    // Automate the parameter now
+                    this.phaser.automate (parmName, setValue, 0, when);
+                }
+            }
+        };
+
+        args.MIDIHandler.setMIDICallback (onMIDIMessage.bind (this));
 
         // Initialization made it so far: plugin is ready.
         args.hostInterface.setInstanceStatus ('ready');
