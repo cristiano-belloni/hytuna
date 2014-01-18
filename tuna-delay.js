@@ -6,7 +6,7 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII',
         osc: false,
         audioOut: 1,
         audioIn: 1,
-        version: '0.0.1-alpha1',
+        version: '0.0.2',
         ui: {
             type: 'canvas',
             width: 441,
@@ -150,11 +150,6 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII',
             wetLevel: u.throttle(function (val) { this.repainter ("wetLevel", val)}, 500).bind(this),
             dryLevel: u.throttle(function (val) { this.repainter ("dryLevel", val)}, 500).bind(this)
         };
-
-        // Throttle the repaints
-        this.repaintFunc = function (id) {
-
-        }.bind(this);
 
         var onMIDIMessage = function (message, when) {
 
