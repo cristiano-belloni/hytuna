@@ -1,5 +1,5 @@
 define(['require', 'github:janesconference/KievII@0.6.0/kievII',
-        'github:janesconference/tuna@master/tuna'], function(require, K2, Tuna) {
+        'github:janesconference/tuna@master/tuna', './utilities'], function(require, K2, Tuna, u) {
   
     var pluginConf = {
         name: "Tuna Chorus",
@@ -123,6 +123,17 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII',
         };
         args.hostInterface.setSaveState (saveState.bind(this));
 
+
+        // Throttle the repaints
+        this.repaintFunc = u.throttle (function (id, value) {
+            /* TODO TRANSFORM THE VALUE BACK */
+            var parameter = this.findKnob (id);
+            var setValue = K2.MathUtils.linearRange (parameter.range[0], parameter.range[1], 0, 1, value);
+            this.ui.setValue ({elementID: id, value: setValue, fireCallback:false});
+            this.ui.refresh();
+        }.bind(this),
+        500);
+
         var onMIDIMessage = function (message, when) {
             var now = this.context.currentTime;
             //console.log ("arrived MIDI message: type / when / now", message.type, when, now);
@@ -178,6 +189,9 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII',
                 this.chorus[parmName] = setValue;
                 // TODO do we really want to save the MIDI - induced change in the state? This might be OK for keyboards attached, but not ok for sequencers.
                 this.pluginState[parmName] = setValue;
+
+                // Repaint
+                this.repaintFunc (parmName, setValue);
             }
         };
 

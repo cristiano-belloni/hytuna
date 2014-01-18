@@ -1,5 +1,5 @@
 define(['require', 'github:janesconference/KievII@0.6.0/kievII',
-    'github:Dinahmoe/tuna@master/tuna'], function(require, K2, Tuna) {
+    'github:janesconference/tuna@master/tuna', './utilities'], function(require, K2, Tuna, u) {
   
     var pluginConf = {
         name: "Tuna Tremolo",
@@ -41,34 +41,6 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII',
                 bypass: 0
             };
         }
-
-        this.throttle = function(func, wait, options) {
-            var context, args, result;
-            var timeout = null;
-            var previous = 0;
-            options || (options = {});
-            var later = function() {
-                previous = options.leading === false ? 0 : new Date;
-                timeout = null;
-                result = func.apply(context, args);
-            };
-            return function() {
-                var now = new Date;
-                if (!previous && options.leading === false) previous = now;
-                var remaining = wait - (now - previous);
-                context = this;
-                args = arguments;
-                if (remaining <= 0) {
-                    clearTimeout(timeout);
-                    timeout = null;
-                    previous = now;
-                    result = func.apply(context, args);
-                } else if (!timeout && options.trailing !== false) {
-                    timeout = setTimeout(later, remaining);
-                }
-                return result;
-            };
-        };
         
         this.tremolo = new tuna.Tremolo(this.pluginState);
     
@@ -153,7 +125,7 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII',
         args.hostInterface.setSaveState (saveState.bind (this));
 
         // Throttle the repaints
-        this.repaintFunc = this.throttle (function (id, value) {
+        this.repaintFunc = u.throttle (function (id, value) {
             /* TODO TRANSFORM THE VALUE BACK */
             var parameter = this.findKnob (id);
             var setValue = K2.MathUtils.linearRange (parameter.range[0], parameter.range[1], 0, 1, value);
