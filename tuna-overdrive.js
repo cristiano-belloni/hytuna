@@ -7,6 +7,7 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII',
         audioOut: 1,
         audioIn: 1,
         version: '0.0.2',
+	hyaId: 'TunaOverdrive',
         ui: {
             type: 'canvas',
             width: 332,
