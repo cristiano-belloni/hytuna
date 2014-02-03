@@ -3,7 +3,6 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII',
   
     var pluginConf = {
         name: "Tuna Filter",
-        osc: false,
         audioOut: 1,
         audioIn: 1,
         version: '0.0.2',
@@ -108,7 +107,6 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII',
                 }
                 if (knobElIndex !== -1) {
                     var setValue = K2.MathUtils.linearRange (0, 1, currKnob.range[0], currKnob.range[1], value);
-                    console.log ("Setting", value, setValue, "to", element);
                     this.filter[element] = this.pluginState[element] = setValue;
                 }
                 else {
@@ -170,7 +168,6 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII',
                 filtIndex = (filtIndex + 1) % filterList.length;
                 this.pluginState.filterType = this.filter.filterType = filtIndex;
                 // Change the label value here
-                console.log (filterList[filtIndex], filtIndex, this.filter.filterType);
                 this.ui.setValue({elementID: "filterLabel", slot: 'labelvalue', value: filterList[filtIndex]});
                 this.ui.refresh();
             }.bind(this)
@@ -199,7 +196,6 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII',
                 }
                 this.pluginState.filterType = this.filter.filterType = filtIndex;
                 // Change the label value here
-                console.log (filterList[filtIndex], filtIndex, this.filter.filterType);
                 this.ui.setValue({elementID: "filterLabel", slot: 'labelvalue', value: filterList[filtIndex]});
                 this.ui.refresh();
             }.bind(this)

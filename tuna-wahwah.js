@@ -3,7 +3,6 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII',
   
     var pluginConf = {
         name: "Tuna Wah-Wah",
-        osc: false,
         audioOut: 1,
         audioIn: 1,
         version: '0.0.2',
@@ -112,7 +111,6 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII',
                 }
                 if (knobElIndex !== -1) {
                     var setValue = K2.MathUtils.linearRange (0, 1, currKnob.range[0], currKnob.range[1], value);
-                    console.log ("Setting", value, setValue, "to", element);
                     this.wahwah[element] = this.pluginState[element] = setValue;
                 }
                 else {

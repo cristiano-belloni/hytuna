@@ -3,7 +3,6 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII',
   
     var pluginConf = {
         name: "Tuna Overdrive",
-        osc: false,
         audioOut: 1,
         audioIn: 1,
         version: '0.0.2',
@@ -108,7 +107,6 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII',
                 }
                 if (knobElIndex !== -1) {
                     var setValue = K2.MathUtils.linearRange (0, 1, currKnob.range[0], currKnob.range[1], value);
-                    console.log ("Setting", value, setValue, "to", element);
                     this.od[element] = this.pluginState[element] = setValue;
                 }
                 else {
@@ -160,7 +158,6 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII',
                 currentAlgo = (currentAlgo + 1) % (algoN + 1);
                 this.pluginState.algorithmIndex = this.od.algorithmIndex = currentAlgo;
                 // Change the label value here
-                console.log (currentAlgo);
                 this.ui.setValue({elementID: "algoLabel", slot: 'labelvalue', value: "Algorithm: " + currentAlgo});
                 this.ui.refresh();
             }.bind(this)

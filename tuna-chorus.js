@@ -3,7 +3,6 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII',
   
     var pluginConf = {
         name: "Tuna Chorus",
-        osc: false,
         audioOut: 1,
         audioIn: 1,
         version: '0.0.2',

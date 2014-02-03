@@ -3,7 +3,6 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII',
   
     var pluginConf = {
         name: "Tuna Convolver",
-        osc: false,
         audioOut: 1,
         audioIn: 1,
         version: '0.0.2',
@@ -56,7 +55,7 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII',
             var file = files[0];
             if (!file) return;
 
-            console.log ("Loading ", files);
+            //console.log ("Loading ", files);
             var reader = new FileReader();
 
             // set the file to save in the future
@@ -70,7 +69,7 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII',
         }.bind(this);
 
         this.successCallback = function (decoded) {
-            console.log ("Decode succeeded!");
+            //console.log ("Decode succeeded!");
             this.convo.decodedBuffer = decoded;
 
             this.decoded_arrayL = decoded.getChannelData (0);
@@ -78,7 +77,7 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII',
             // TODO check if the signal is mono or stero here
             // this.decoded_arrayR = decoded.getChannelData (1);
 
-            console.log ("I got the data!");
+            //console.log ("I got the data!");
 
             var waveID = 'wavebox_L';
 
@@ -111,15 +110,11 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII',
         }.bind(this);
 
         this.errorCallback = function () {
-            console.log ("Error!");
+            console.error ("Error!");
             // TODO signal the error to the user
         }.bind(this);
 
         this.handleReaderLoad = function (evt) {
-
-            console.log (evt);
-
-            console.log ("Decoding file");
 
             this.context.decodeAudioData(evt.target.result, this.successCallback, this.errorCallback);
 
@@ -212,7 +207,6 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII',
                 }
                 if (knobElIndex !== -1) {
                     var setValue = K2.MathUtils.linearRange (0, 1, currKnob.range[0], currKnob.range[1], value);
-                    console.log ("Setting", value, setValue, "to", element);
                     this.convo[element] = this.pluginState[element] = setValue;
                 }
                 else {
