@@ -108,7 +108,8 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII',
                 }
                 if (knobElIndex !== -1) {
                     var setValue = K2.MathUtils.linearRange (0, 1, currKnob.range[0], currKnob.range[1], value);
-                    this.delay[element] = this.pluginState[element] = setValue;
+                    this.pluginState[element] = setValue;
+                    this.delay.automate (element, setValue, 0, this.context.currentTime);
                 }
                 else {
                     console.error ("element index invalid:",  knobElIndex);
@@ -197,7 +198,7 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII',
                 if (!when) {
                     // Immediately
                     //this.delay[parmName] = setValue;
-                    this.delay.automate (parmName, setValue, 0, 0);
+                    this.delay.automate (parmName, setValue, 0, this.context.currentTime);
                     this.pluginState[parmName] = setValue;
                     // Repaint
                     this.throttledFuncs[parmName](setValue);
