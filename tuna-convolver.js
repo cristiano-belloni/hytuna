@@ -207,7 +207,7 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII',
                 }
                 if (knobElIndex !== -1) {
                     var setValue = K2.MathUtils.linearRange (0, 1, currKnob.range[0], currKnob.range[1], value);
-                    this.pluginState[element] = setValue;
+                    this.convo[element] = this.pluginState[element] = setValue;
                     this.convo.automate (element, setValue, 0, this.context.currentTime);
                 }
                 else {
@@ -295,7 +295,7 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII',
                 if (!when) {
                     // Immediately
                     this.convo.automate (parmName, setValue, 0, this.context.currentTime);
-                    this.pluginState[parmName] = setValue;
+                    this.convo[parmName] = this.pluginState[parmName] = setValue;
                     // Repaint
                     this.throttledFuncs[parmName](setValue);
                 }

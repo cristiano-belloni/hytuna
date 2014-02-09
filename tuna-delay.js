@@ -15,12 +15,12 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII',
     };
 
     var pluginFunction = function(args, resources) {
-        
+
         this.id = args.id;
         this.audioSource = args.audioSources[0];
         this.audioDestination = args.audioDestinations[0];
         this.context = args.audioContext;
-        
+
         var knobImage =  resources[0];
         var deckImage =  resources[1];
 
@@ -39,15 +39,15 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII',
                 bypass: 0
             };
         }
-        
+
         var tuna = new Tuna(this.context);
-        
+
         this.delay = new tuna.Delay(this.pluginState);
-        
-    
+
+
         this.audioSource.connect(this.delay.input);
         this.delay.connect(this.audioDestination);
-       
+
         // The canvas part
         this.ui = new K2.UI ({type: 'CANVAS2D', target: args.canvas});
 
@@ -81,9 +81,9 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII',
             top: 0,
             left: 0
         });
-    
+
         this.ui.addElement(bgArgs, {zIndex: 0});
-        
+
         /* knobs */
         var knobArgs = {
              ID: "",
@@ -108,7 +108,7 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII',
                 }
                 if (knobElIndex !== -1) {
                     var setValue = K2.MathUtils.linearRange (0, 1, currKnob.range[0], currKnob.range[1], value);
-                    this.pluginState[element] = setValue;
+                    this.delay[element] = this.pluginState[element] = setValue;
                     this.delay.automate (element, setValue, 0, this.context.currentTime);
                 }
                 else {
@@ -197,9 +197,8 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII',
 
                 if (!when) {
                     // Immediately
-                    //this.delay[parmName] = setValue;
                     this.delay.automate (parmName, setValue, 0, this.context.currentTime);
-                    this.pluginState[parmName] = setValue;
+                    this.delay[parmName] = this.pluginState[parmName] = setValue;
                     // Repaint
                     this.throttledFuncs[parmName](setValue);
                 }
