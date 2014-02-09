@@ -196,7 +196,8 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII',
 
                 if (!when) {
                     // Immediately
-                    this.delay[parmName] = setValue;
+                    //this.delay[parmName] = setValue;
+                    this.delay.automate (parmName, setValue, 0, this.context.currentTime);
                     this.pluginState[parmName] = setValue;
                     // Repaint
                     this.throttledFuncs[parmName](setValue);
