@@ -259,7 +259,7 @@ define(['require', 'github:janesconference/KievII@0.6.0/kievII',
                         setTimeout (this.throttledFuncs[parmName], delta * 1000, setValue);
                     }
                     // Automate the parameter now
-                    this.od.automate (parmName, setValue, 0, when);
+                    this.od.automate (parmName, setValue, 0, when * 1000);
                 }
             }
         };
